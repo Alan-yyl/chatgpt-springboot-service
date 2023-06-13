@@ -60,6 +60,12 @@ public class MyWebsocketHandler extends AbstractWebSocketHandler {
         webSocketBeanMap.remove(session.getId());
     }
 
+    /**
+     * 接收到客户端请求时调用
+     * @param session
+     * @param message
+     * @throws Exception
+     */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String user = webSocketBeanMap.get(session.getId()).getClientId();
@@ -68,6 +74,8 @@ public class MyWebsocketHandler extends AbstractWebSocketHandler {
                 "]; Content is [" + message.getPayload() + "].");
         TextMessage textMessage;
         Message returnMessage = chatGPTUtil.chat(message.getPayload(), user);
+        logger.info("response message to client[ID:" + user +
+                "]; Content is [" + returnMessage.getContent() + "].");
         textMessage= new TextMessage(returnMessage.getContent());
         session.sendMessage(textMessage);
     }

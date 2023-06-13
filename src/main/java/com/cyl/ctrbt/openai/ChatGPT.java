@@ -105,9 +105,9 @@ public class ChatGPT {
         client.connectTimeout(timeout, TimeUnit.SECONDS);
         client.writeTimeout(timeout, TimeUnit.SECONDS);
         client.readTimeout(timeout, TimeUnit.SECONDS);
-        if (Objects.nonNull(proxy)) {
-            client.proxy(proxy);
-        }
+        // if (Objects.nonNull(proxy)) {
+        //     client.proxy(proxy);
+        // }
         OkHttpClient httpClient = client.build();
         this.okHttpClient = httpClient;
 
