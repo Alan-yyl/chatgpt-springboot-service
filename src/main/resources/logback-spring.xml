@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 日志级别由高到低为：FATAL > ERROR > WARN > INFO > DEBUG > TRACE -->
+<!-- appender依附于root与logger，logger将日志事件交由appender进行输出 -->
+<configuration>
+	<!-- 变量替换配置-->
+	<!-- 因为logback配置文件的名称为：logback-spring.xml，所以可以加载application.properties等配置文件中的配置 -->
+	<!-- 设置领域名和应用名的变量替换配置，作用域为context -->
+	<springProperty scope="context" name="spring.domain.name" source="spring.domain.name"/>
+	<springProperty scope="context" name="spring.application.name" source="spring.application.name"/>
+	<property name="logging.path" value="data/logs/app"/>
+
+	<!-- PATTERN配置-->
+	<!-- 控制台日志格式 -->
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="${CONSOLE_LOG_PATTERN:-%date{yyyy-MM-dd HH:mm:ss.SSS} [${LOG_LEVEL_PATTERN:-%-5level}] ${PID:- } [%thread] %logger [%X{req.requestURL}] : %msg %ex%n}"/>
+	<!-- 通用日志格式：用于流水线应用打印日志 -->
+	<property name="COMMON_LOG_PATTERN"
+			  value="%date{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] [%logger] [%X{traceId}] [%X{spanId}] [%X{pSpanId}] [%X{rpcOccurrence}] [%X{code}] [%X{req.requestURL}] [%X{req.queryString}] [${spring.domain.name},${spring.application.name},%X{sysId},%X{tenantId},%X{userId},%X{profile},%X{agentId}] - %msg %ex%n" />
+
+	<!-- 日志输出配置 -->
+	<!-- 1.输出到控制台 -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	<!-- 2.输出到文档 -->
+	<appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logging.path}/${spring.application.name}.log</file>
+		<!-- 日志记录器的滚动策略，按日期记录 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logging.path}/${spring.application.name}.%d{yyyy-MM-dd}.log.bak</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${COMMON_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 配置root logger的日志level与appender -->
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ROLLING_FILE" />
+	</root>
+
+	<!-- 配置具体类的日志level，name为完全限定类名或包名 -->
+	<!-- 当name为包名时，其下所有未显式指定日志level的类，其logger都将继承包logger的日志level -->
+	<logger name="org.springframework" level="INFO"  />
+	<logger name="org.apache.tomcat" level="INFO"  />
+	<logger name="org.apache.ibatis.io" level="INFO"  />
+	<logger name="org.mybatis.spring" level="INFO"  />
+	<logger name="com.cyl.ctrbt" level="INFO"  />
+</configuration>
+

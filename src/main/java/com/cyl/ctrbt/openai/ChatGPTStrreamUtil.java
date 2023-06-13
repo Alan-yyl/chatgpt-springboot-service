@@ -21,31 +21,14 @@ public class ChatGPTStrreamUtil {
 
     private ChatGPTStream chatGPTStream;
 
-    @Value("${proxy.ip}")
-    private String proxyIp;
-    @Value("${proxy.port}")
-    private Integer proxyPort;
-
     @PostConstruct
     public void init(){
-        //如果在国内访问，使用这个
-        if(!StringUtils.isEmpty(proxyIp)){
-            Proxy proxy = Proxys.http(proxyIp, proxyPort);
-            chatGPTStream = ChatGPTStream.builder()
-                    .apiKey(token)
-                    .timeout(900)
-                    .proxy(proxy)
-                    .apiHost("https://api.openai.com/") //代理地址
-                    .build()
-                    .init();
-        }else{
-            chatGPTStream = ChatGPTStream.builder()
-                    .apiKey(token)
-                    .timeout(900)
-                    .apiHost("https://api.openai.com/") //代理地址
-                    .build()
-                    .init();
-        }
+        chatGPTStream = ChatGPTStream.builder()
+                .apiKey(token)
+                .timeout(900)
+                .apiHost("https://api.openai.com/") //代理地址
+                .build()
+                .init();
     }
     public void chat(String userMessage,String user) {
         ConsoleStreamListener listener = new ConsoleStreamListener();
